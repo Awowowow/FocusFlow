@@ -25,9 +25,15 @@ export const openapi = {
     "/tasks/{taskId}/timer/start": { post: { tags: ["Time"], summary: "Start exclusive timer", responses: { 201: { description: "Started" }, 409: { description: "Another timer is active" } } } },
     "/tasks/{taskId}/timer/stop": { post: { tags: ["Time"], summary: "Stop and persist elapsed session", responses: { 200: { description: "Stopped" } } } },
     "/time/active": { get: { tags: ["Time"], summary: "Active user timer", responses: { 200: { description: "Active timer or null" } } } },
-    "/time/logs": { get: { tags: ["Time"], summary: "List owned time logs", responses: { 200: { description: "Logs" } } } },
+    "/time/logs": {
+      get: { tags: ["Time"], summary: "List owned time logs", responses: { 200: { description: "Logs" } } },
+      post: { tags: ["Time"], summary: "Create a completed historical time log", responses: { 201: { description: "Created" }, 409: { description: "Overlapping log" } } },
+    },
+    "/time/logs/{logId}": {
+      patch: { tags: ["Time"], summary: "Correct a completed time log", responses: { 200: { description: "Updated" }, 409: { description: "Active or overlapping log" } } },
+      delete: { tags: ["Time"], summary: "Delete a completed time log", responses: { 204: { description: "Deleted" }, 409: { description: "Active log" } } },
+    },
     "/summary/today": { get: { tags: ["Summary"], summary: "Daily productivity summary in user timezone", responses: { 200: { description: "Summary" } } } },
     "/summary/weekly": { get: { tags: ["Summary"], summary: "Seven day tracked-time series", responses: { 200: { description: "Chart-ready series" } } } },
   },
 };
-

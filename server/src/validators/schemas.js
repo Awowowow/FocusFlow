@@ -49,3 +49,22 @@ export const logsQuerySchema = z.object({
   taskId: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(100).default(30),
 });
+
+const historicalSessionFields = {
+  startedAt: z.iso.datetime(),
+  endedAt: z.iso.datetime(),
+  note: optionalText(280),
+};
+
+export const createLogSchema = z.object({
+  taskId: z.string().min(1),
+  ...historicalSessionFields,
+}).refine((input) => new Date(input.endedAt) > new Date(input.startedAt), {
+  message: "End time must be after start time.",
+  path: ["endedAt"],
+});
+
+export const updateLogSchema = z.object(historicalSessionFields).refine((input) => new Date(input.endedAt) > new Date(input.startedAt), {
+  message: "End time must be after start time.",
+  path: ["endedAt"],
+});

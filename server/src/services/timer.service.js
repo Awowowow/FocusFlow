@@ -57,3 +57,64 @@ export async function listLogs(userId, input) {
     take: input.limit,
   });
 }
+
+export async function createLog(userId, input) {
+  return prisma.$transaction(async (tx) => {
+    await ensureTask(userId, input.taskId, tx);
+    const startedAt = new Date(input.startedAt);
+    const endedAt = new Date(input.endedAt);
+    await ensureNoOverlap(tx, userId, startedAt, endedAt);
+    return tx.timeLog.create({
+      data: {
+        userId,
+        taskId: input.taskId,
+        startedAt,
+        endedAt,
+        durationSeconds: durationSeconds(startedAt, endedAt),
+        note: input.note,
+      },
+      include: { task: { select: { id: true, title: true, status: true } } },
+    });
+  });
+}
+
+export async function updateLog(userId, logId, input) {
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.timeLog.findFirst({ where: { id: logId, userId } });
+    if (!existing) throw new AppError(404, "Time log not found.", "TIME_LOG_NOT_FOUND");
+    if (!existing.endedAt) throw new AppError(409, "Stop an active timer before editing it.", "ACTIVE_TIMER");
+    const startedAt = new Date(input.startedAt);
+    const endedAt = new Date(input.endedAt);
+    await ensureNoOverlap(tx, userId, startedAt, endedAt, logId);
+    return tx.timeLog.update({
+      where: { id: logId },
+      data: { startedAt, endedAt, durationSeconds: durationSeconds(startedAt, endedAt), note: input.note },
+      include: { task: { select: { id: true, title: true, status: true } } },
+    });
+  });
+}
+
+export async function deleteLog(userId, logId) {
+  const existing = await prisma.timeLog.findFirst({ where: { id: logId, userId } });
+  if (!existing) throw new AppError(404, "Time log not found.", "TIME_LOG_NOT_FOUND");
+  if (!existing.endedAt) throw new AppError(409, "Stop an active timer before deleting it.", "ACTIVE_TIMER");
+  await prisma.timeLog.delete({ where: { id: logId } });
+}
+
+function durationSeconds(startedAt, endedAt) {
+  return Math.max(1, Math.floor((endedAt - startedAt) / 1000));
+}
+
+async function ensureNoOverlap(tx, userId, startedAt, endedAt, excludedId) {
+  const conflicting = await tx.timeLog.findFirst({
+    where: {
+      userId,
+      ...(excludedId && { id: { not: excludedId } }),
+      startedAt: { lt: endedAt },
+      OR: [{ endedAt: null }, { endedAt: { gt: startedAt } }],
+    },
+  });
+  if (conflicting) {
+    throw new AppError(409, "This session overlaps an existing time log.", "TIME_LOG_OVERLAP");
+  }
+}
