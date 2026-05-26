@@ -7,7 +7,7 @@ Focused Flow is a full-stack task and time tracking application built for focuse
 - Source repository: [github.com/Awowowow/FocusFlow](https://github.com/Awowowow/FocusFlow)
 - Live application: [focus-flow-ten-navy.vercel.app](https://focus-flow-ten-navy.vercel.app)
 - API health endpoint: [focus-flow-backend-chi.vercel.app/api/health](https://focus-flow-backend-chi.vercel.app/api/health)
-- Demo account after local seeding: `demo@focusflow.app` / `Focusflow123`
+- Reviewer demo account: `demo@focusflow.app` / `Focusflow123`
 
 ## Features
 
@@ -119,6 +119,16 @@ npm run dev:client
 ```
 
 Open [http://localhost:5173](http://localhost:5173). You can create a new account or use the seeded demo account.
+
+### Seed Reviewer Demo Data In Production
+
+Run the same seed once against the Neon production database from a secure environment. It refreshes only the dedicated `demo@focusflow.app` account and creates sample tasks, reminders and time logs for reviewer walkthroughs:
+
+```bash
+DATABASE_URL="your-neon-production-connection-string" npm run db:seed --prefix server
+```
+
+Do not commit or share the production connection string.
 
 ## API Overview
 

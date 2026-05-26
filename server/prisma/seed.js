@@ -5,13 +5,18 @@ const prisma = new PrismaClient();
 
 const main = async () => {
   const email = "demo@focusflow.app";
+  const passwordHash = await bcrypt.hash("Focusflow123", 12);
   const user = await prisma.user.upsert({
     where: { email },
-    update: {},
+    update: {
+      name: "Demo User",
+      passwordHash,
+      timezone: "Asia/Kolkata",
+    },
     create: {
       name: "Demo User",
       email,
-      passwordHash: await bcrypt.hash("Focusflow123", 12),
+      passwordHash,
       timezone: "Asia/Kolkata",
     },
   });
