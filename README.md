@@ -5,7 +5,7 @@ Focused Flow is a full-stack task and time tracking application built for focuse
 ## Submission Links
 
 - Source repository: [github.com/Awowowow/FocusFlow](https://github.com/Awowowow/FocusFlow)
-- Live application: [focus-flow-ten-navy.vercel.app](https://focus-flow-ten-navy.vercel.app/login)
+- Live application: [focus-flow-ten-navy.vercel.app](https://focus-flow-ten-navy.vercel.app)
 - API health endpoint: [focus-flow-backend-chi.vercel.app/api/health](https://focus-flow-backend-chi.vercel.app/api/health)
 - Demo account after local seeding: `demo@focusflow.app` / `Focusflow123`
 
@@ -195,14 +195,12 @@ Output Directory: dist
 Install Command: npm install
 ```
 
-After the backend has a production URL, configure the frontend API proxy to forward `/api` requests to that backend before deploying the frontend. This keeps session cookies on the frontend origin for reliable browser authentication.
-
-Production and Preview environment variable after the proxy is configured:
+Production and Preview environment variable:
 
 ```env
-VITE_API_URL=/api
+VITE_API_URL=https://backend-domain.vercel.app/api
 ```
 
-After both projects are deployed, update API `CLIENT_URL` to the production frontend URL and redeploy the API.
+After both projects are deployed, update API `CLIENT_URL` to the production frontend URL and redeploy the API so credentialed requests receive the correct CORS headers.
 
-Before submission, replace the pending live links at the top of this file after production smoke testing.
+The deployed instance is linked at the top of this file.
