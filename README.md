@@ -155,26 +155,54 @@ npm run build --prefix client
 ## Deployment Plan
 
 - Database: Neon PostgreSQL
-- Backend: Render web service with `server` as the root directory
-- Frontend: Vercel with `client` as the root directory
+- Backend: Vercel Express Function with `server` as the root directory
+- Frontend: Vercel Vite application with `client` as the root directory
 
-Production environment variables required on the API:
+### Backend Deployment
+
+Import this GitHub repository into Vercel as a project with:
+
+```text
+Root Directory: server
+Framework Preset: Other
+Build Command: npm install && npx prisma generate && npx prisma migrate deploy
+Output Directory: leave empty
+Install Command: npm install
+```
+
+Production and Preview environment variables required on the API project:
 
 ```env
 NODE_ENV=production
 CLIENT_URL=https://frontend-domain.vercel.app
 DATABASE_URL=neon-postgresql-url
 JWT_SECRET=a-long-random-production-secret
+JWT_EXPIRES_IN=7d
+COOKIE_NAME=focusflow_token
 GEMINI_API_KEY=google-ai-studio
 GEMINI_MODEL=gemini-2.5-flash
 ```
 
-Frontend environment variable:
+### Frontend Deployment
 
-```env
-VITE_API_URL=https://render-api-domain.onrender.com/api
+Import this GitHub repository a second time into Vercel with:
+
+```text
+Root Directory: client
+Framework Preset: Vite
+Build Command: npm run build
+Output Directory: dist
+Install Command: npm install
 ```
 
-For Vercel-to-Render authentication, the API already issues a secure cross-site session cookie in production and accepts credentialed requests only from `CLIENT_URL`.
+After the backend has a production URL, configure the frontend API proxy to forward `/api` requests to that backend before deploying the frontend. This keeps session cookies on the frontend origin for reliable browser authentication.
+
+Production and Preview environment variable after the proxy is configured:
+
+```env
+VITE_API_URL=/api
+```
+
+After both projects are deployed, update API `CLIENT_URL` to the production frontend URL and redeploy the API.
 
 Before submission, replace the pending live links at the top of this file after production smoke testing.

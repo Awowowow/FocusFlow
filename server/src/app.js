@@ -40,3 +40,5 @@ app.use("/api/summary", requireAuth, summaryRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
+
+export default app;
