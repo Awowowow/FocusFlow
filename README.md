@@ -164,10 +164,10 @@ Import this GitHub repository into Vercel as a project with:
 
 ```text
 Root Directory: server
-Framework Preset: Other
-Build Command: npm install && npx prisma generate && npx prisma migrate deploy
-Output Directory: leave empty
-Install Command: npm install
+Framework Preset: Express (configured in `server/vercel.json`)
+Build Command: npx prisma generate && npx prisma migrate deploy (configured in `server/vercel.json`)
+Output Directory: do not override
+Install Command: npm install (configured in `server/vercel.json`)
 ```
 
 Production and Preview environment variables required on the API project:
