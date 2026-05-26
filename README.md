@@ -5,8 +5,8 @@ Focused Flow is a full-stack task and time tracking application built for focuse
 ## Submission Links
 
 - Source repository: [github.com/Awowowow/FocusFlow](https://github.com/Awowowow/FocusFlow)
-- Live application: Deployment pending
-- API health endpoint: Deployment pending
+- Live application: [focus-flow-ten-navy.vercel.app](https://focus-flow-ten-navy.vercel.app/login)
+- API health endpoint: [focus-flow-backend-chi.vercel.app/api/health](https://focus-flow-backend-chi.vercel.app/api/health)
 - Demo account after local seeding: `demo@focusflow.app` / `Focusflow123`
 
 ## Features
