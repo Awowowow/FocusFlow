@@ -3,7 +3,7 @@ import { suggestTask } from "../services/ai.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const list = asyncHandler(async (req, res) => {
-  res.json({ tasks: await taskService.listTasks(req.user.id, req.query) });
+  res.json({ tasks: await taskService.listTasks(req.user.id, req.validatedQuery) });
 });
 
 export const detail = asyncHandler(async (req, res) => {
@@ -26,4 +26,3 @@ export const remove = asyncHandler(async (req, res) => {
 export const suggest = asyncHandler(async (req, res) => {
   res.json({ suggestion: await suggestTask(req.body.input) });
 });
-

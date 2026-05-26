@@ -14,6 +14,5 @@ export const stop = asyncHandler(async (req, res) => {
 });
 
 export const logs = asyncHandler(async (req, res) => {
-  res.json({ timeLogs: await timerService.listLogs(req.user.id, req.query) });
+  res.json({ timeLogs: await timerService.listLogs(req.user.id, req.validatedQuery) });
 });
-
