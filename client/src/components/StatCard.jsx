@@ -1,4 +1,4 @@
-export function StatCard({ label, value, detail, icon: Icon, tone = "purple" }) {
+export const StatCard = ({ label, value, detail, icon: Icon, tone = "purple" }) => {
   return (
     <article className={`stat-card ${tone}`}>
       <div className="stat-icon"><Icon size={21} /></div>
@@ -9,5 +9,4 @@ export function StatCard({ label, value, detail, icon: Icon, tone = "purple" }) 
       </div>
     </article>
   );
-}
-
+};

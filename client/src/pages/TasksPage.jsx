@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit3, MoreHorizontal, Play, Plus, Search, Square, Trash2 } from "lucide-react";
+import { Bell, CheckCircle2, Edit3, MoreHorizontal, Play, Plus, Search, Square, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { api, patch, post, remove } from "../api/client";
 import { TaskFormModal } from "../components/TaskFormModal";
@@ -9,7 +9,7 @@ import { formatDuration, titleCaseStatus } from "../utils/format";
 
 const filters = [{ label: "All", value: "" }, { label: "Pending", value: "PENDING" }, { label: "In progress", value: "IN_PROGRESS" }, { label: "Completed", value: "COMPLETED" }];
 
-export function TasksPage() {
+export const TasksPage = () => {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
@@ -34,6 +34,11 @@ export function TasksPage() {
     onSuccess: (_result, variables) => { refresh(); toast.success(variables.action === "start" ? "Timer started." : "Session saved."); },
     onError: (error) => toast.error(error.message),
   });
+  const complete = useMutation({
+    mutationFn: (taskId) => patch(`/tasks/${taskId}`, { status: "COMPLETED" }),
+    onSuccess: () => { refresh(); toast.success("Task completed."); },
+    onError: (error) => toast.error(error.message),
+  });
 
   return (
     <div className="content">
@@ -55,8 +60,15 @@ export function TasksPage() {
               <article className="task-row" key={task.id}>
                 <div className={`priority ${task.priority.toLowerCase()}`} />
                 <div className="task-copy">
-                  <div><h3>{task.title}</h3><span className={`status ${task.status.toLowerCase()}`}>{titleCaseStatus(task.status)}</span></div>
+                  <div>
+                    <h3>{task.title}</h3>
+                    <span className={`status ${task.status.toLowerCase()}`}>{titleCaseStatus(task.status)}</span>
+                    {task.status !== "COMPLETED" && !running && (
+                      <button className="quick-complete" disabled={complete.isPending} onClick={() => complete.mutate(task.id)}><CheckCircle2 size={13} /> Mark complete</button>
+                    )}
+                  </div>
                   <p>{task.description || "No description added."}</p>
+                  {task.dueDate && task.status !== "COMPLETED" && <small className={`task-reminder ${new Date(task.dueDate) < new Date() ? "overdue" : ""}`}><Bell size={12} /> {formatDeadline(task.dueDate)}</small>}
                 </div>
                 <div className="tracked"><small>Tracked</small><strong>{formatDuration(task.trackedSeconds)}</strong></div>
                 <button className={running ? "stop-task" : "start-task"} onClick={() => timer.mutate({ taskId: task.id, action: running ? "stop" : "start" })}>
@@ -80,4 +92,10 @@ export function TasksPage() {
       {modalTask !== undefined && <TaskFormModal key={modalTask?.id ?? "new"} task={modalTask} saving={save.isPending} onSave={save.mutate} onClose={() => setModalTask(undefined)} />}
     </div>
   );
-}
+};
+
+const formatDeadline = (dueDate) => {
+  const date = new Date(dueDate);
+  const prefix = date < new Date() ? "Overdue" : "Due";
+  return `${prefix} ${date.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`;
+};

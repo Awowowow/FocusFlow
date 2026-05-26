@@ -2,7 +2,7 @@ import { Pause, Play } from "lucide-react";
 import { clockDuration } from "../utils/format";
 import { useElapsed } from "../hooks/useElapsed";
 
-export function TimerPanel({ activeTimer, onStop, onGoTasks, compact = false }) {
+export const TimerPanel = ({ activeTimer, onStop, onGoTasks, compact = false }) => {
   const elapsed = useElapsed(activeTimer?.startedAt);
   if (!activeTimer) {
     return (
@@ -22,5 +22,4 @@ export function TimerPanel({ activeTimer, onStop, onGoTasks, compact = false }) 
       <button className="stop-btn" onClick={() => onStop(activeTimer.taskId)}><Pause size={16} /> Stop session</button>
     </section>
   );
-}
-
+};

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export function useElapsed(startedAt) {
+export const useElapsed = (startedAt) => {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (!startedAt) return;
@@ -8,4 +8,4 @@ export function useElapsed(startedAt) {
     return () => clearInterval(interval);
   }, [startedAt]);
   return startedAt ? Math.max(0, Math.floor((now - new Date(startedAt).getTime()) / 1000)) : 0;
-}
+};

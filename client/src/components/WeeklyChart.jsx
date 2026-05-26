@@ -1,7 +1,7 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatDuration } from "../utils/format";
 
-export function WeeklyChart({ days = [] }) {
+export const WeeklyChart = ({ days = [] }) => {
   const chartData = days.map((day) => ({ ...day, minutes: Math.round(day.trackedSeconds / 60) }));
   return (
     <section className="card chart-card">
@@ -19,4 +19,4 @@ export function WeeklyChart({ days = [] }) {
       </div>
     </section>
   );
-}
+};

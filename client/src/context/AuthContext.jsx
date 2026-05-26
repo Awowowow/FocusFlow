@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, post } from "../api/client";
 import { AuthContext } from "./auth-context";
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
   const queryClient = useQueryClient();
   const session = useQuery({
     queryKey: ["session"],
@@ -10,23 +10,23 @@ export function AuthProvider({ children }) {
     retry: false,
   });
 
-  async function login(credentials) {
+  const login = async (credentials) => {
     const { user } = await post("/auth/login", credentials);
     queryClient.setQueryData(["session"], user);
     return user;
-  }
+  };
 
-  async function register(details) {
+  const register = async (details) => {
     const { user } = await post("/auth/register", details);
     queryClient.setQueryData(["session"], user);
     return user;
-  }
+  };
 
-  async function logout() {
+  const logout = async () => {
     await post("/auth/logout", {});
-    queryClient.clear();
     queryClient.setQueryData(["session"], null);
-  }
+    queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== "session" });
+  };
 
   return <AuthContext.Provider value={{ user: session.data, loading: session.isLoading, login, register, logout }}>{children}</AuthContext.Provider>;
-}
+};

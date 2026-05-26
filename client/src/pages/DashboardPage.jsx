@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, Clock3, ListTodo, Target } from "lucide-react";
+import { Bell, CheckCircle2, Clock3, ListTodo, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { api, post } from "../api/client";
@@ -9,7 +9,7 @@ import { StatCard } from "../components/StatCard";
 import { TimerPanel } from "../components/TimerPanel";
 import { WeeklyChart } from "../components/WeeklyChart";
 
-export function DashboardPage() {
+export const DashboardPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const client = useQueryClient();
@@ -41,21 +41,38 @@ export function DashboardPage() {
       </div>
       <div className="dashboard-grid">
         <WeeklyChart days={weekly.data?.days} />
-        <section className="card activity-card">
-          <div className="card-title"><div><h2>Today's activity</h2><p>Tasks touched today</p></div><button onClick={() => navigate("/tasks")}>All tasks</button></div>
-          {summary?.tasksWorkedOn.length ? summary.tasksWorkedOn.map((task) => (
-            <div className="activity" key={task.id}>
-              <div><strong>{task.title}</strong><small className={`status ${task.status.toLowerCase()}`}>{titleCaseStatus(task.status)}</small></div>
-              <span>{formatDuration(task.trackedSeconds)}</span>
-            </div>
-          )) : <div className="blank-state">No sessions recorded today. Start a task to see activity here.</div>}
-        </section>
+        <div className="dashboard-stack">
+          <section className="card activity-card">
+            <div className="card-title"><div><h2>Today's activity</h2><p>Tasks touched today</p></div><button onClick={() => navigate("/tasks")}>All tasks</button></div>
+            {summary?.tasksWorkedOn.length ? summary.tasksWorkedOn.map((task) => (
+              <div className="activity" key={task.id}>
+                <div><strong>{task.title}</strong><small className={`status ${task.status.toLowerCase()}`}>{titleCaseStatus(task.status)}</small></div>
+                <span>{formatDuration(task.trackedSeconds)}</span>
+              </div>
+            )) : <div className="blank-state">No sessions recorded today. Start a task to see activity here.</div>}
+          </section>
+          <section className="card reminder-card">
+            <div className="card-title"><div><h2>Reminders</h2><p>Upcoming task deadlines</p></div><Bell size={18} /></div>
+            {summary?.reminders?.length ? summary.reminders.map((task) => (
+              <div className="reminder" key={task.id}>
+                <div><strong>{task.title}</strong><small>{reminderLabel(task.dueDate)}</small></div>
+                <span className={`priority-dot ${task.priority.toLowerCase()}`} />
+              </div>
+            )) : <div className="blank-state compact">Add a deadline to a task to create a reminder.</div>}
+          </section>
+        </div>
       </div>
     </div>
   );
-}
+};
 
-function greeting() {
+const greeting = () => {
   const hour = new Date().getHours();
   return hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening";
-}
+};
+
+const reminderLabel = (dueDate) => {
+  const date = new Date(dueDate);
+  if (date < new Date()) return `Overdue · ${date.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`;
+  return `Due ${date.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`;
+};

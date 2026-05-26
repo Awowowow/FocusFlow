@@ -8,15 +8,15 @@ const DashboardPage = lazy(() => import("./pages/DashboardPage").then((module) =
 const LogsPage = lazy(() => import("./pages/LogsPage").then((module) => ({ default: module.LogsPage })));
 const TasksPage = lazy(() => import("./pages/TasksPage").then((module) => ({ default: module.TasksPage })));
 
-function ProtectedShell() {
+const ProtectedShell = () => {
   const { user, loading } = useAuth();
-  if (loading) return <div className="loading-page">Loading FocusFlow...</div>;
+  if (loading) return <div className="loading-page">Loading Focused Flow...</div>;
   return user ? <AppShell /> : <Navigate to="/login" replace />;
-}
+};
 
-export default function App() {
+const App = () => {
   return (
-    <Suspense fallback={<div className="loading-page">Loading FocusFlow...</div>}>
+    <Suspense fallback={<div className="loading-page">Loading Focused Flow...</div>}>
       <Routes>
         <Route path="/login" element={<AuthPage mode="login" />} />
         <Route path="/signup" element={<AuthPage mode="signup" />} />
@@ -29,4 +29,6 @@ export default function App() {
       </Routes>
     </Suspense>
   );
-}
+};
+
+export default App;

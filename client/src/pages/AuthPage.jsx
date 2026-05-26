@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { ArrowRight, Clock3, ShieldCheck, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Clock3, ShieldCheck, Sparkles } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
+import { BrandLogo } from "../components/BrandLogo";
 
-export function AuthPage({ mode }) {
+export const AuthPage = ({ mode }) => {
   const signup = mode === "signup";
   const { user, login, register } = useAuth();
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export function AuthPage({ mode }) {
   const [submitting, setSubmitting] = useState(false);
   if (user) return <Navigate to="/" replace />;
 
-  async function submit(event) {
+  const submit = async (event) => {
     event.preventDefault();
     setSubmitting(true);
     try {
@@ -25,12 +26,12 @@ export function AuthPage({ mode }) {
     } finally {
       setSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="auth-layout">
       <section className="auth-hero">
-        <div className="brand"><span><Zap size={18} /></span> FocusFlow</div>
+        <BrandLogo inverse />
         <div className="auth-copy">
           <span className="pill"><Sparkles size={14} /> Intent into momentum</span>
           <h1>Track focused work.<br />Finish what matters.</h1>
@@ -44,7 +45,7 @@ export function AuthPage({ mode }) {
       <section className="auth-form-wrap">
         <form className="auth-card" onSubmit={submit}>
           <span className="eyebrow">{signup ? "Get started" : "Welcome back"}</span>
-          <h2>{signup ? "Create your account" : "Sign in to FocusFlow"}</h2>
+          <h2>{signup ? "Create your account" : "Sign in to Focused Flow"}</h2>
           <p>{signup ? "Build your productivity workspace in seconds." : "Pick up exactly where you left off."}</p>
           {signup && (
             <label>Full name
@@ -61,11 +62,11 @@ export function AuthPage({ mode }) {
             {submitting ? "Please wait..." : signup ? "Create account" : "Sign in"} <ArrowRight size={17} />
           </button>
           <p className="switch-auth">
-            {signup ? "Already have an account?" : "New to FocusFlow?"}{" "}
+            {signup ? "Already have an account?" : "New to Focused Flow?"}{" "}
             <button type="button" onClick={() => navigate(signup ? "/login" : "/signup")}>{signup ? "Sign in" : "Create account"}</button>
           </p>
         </form>
       </section>
     </div>
   );
-}
+};
