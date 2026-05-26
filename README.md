@@ -1,6 +1,6 @@
-# FocusFlow
+# Focused Flow
 
-FocusFlow is a full-stack task and time tracking application built for focused individual productivity. Users can turn rough task ideas into structured work, track sessions in real time, and review daily and weekly progress in a polished dashboard.
+Focused Flow is a full-stack task and time tracking application built for focused individual productivity. Users can turn rough task ideas into structured work, track sessions in real time, and review daily and weekly progress in a polished dashboard.
 
 ## Submission Links
 
@@ -12,10 +12,12 @@ FocusFlow is a full-stack task and time tracking application built for focused i
 
 - Secure sign up, login and logout using an HTTP-only JWT cookie and bcrypt password hashing
 - Strict user ownership checks on every task, timer and analytics endpoint
-- Task CRUD with statuses, priorities, full-text filtering and editable AI-assisted suggestions
+- Task CRUD with statuses, priorities, full-text filtering and editable Gemini-assisted suggestions
+- One-click task completion for fast workflow updates
 - Exclusive real-time timer: only one active session per user, with refresh-safe elapsed display
-- Time log history and tracked totals per task
+- Time log history with manual create/edit/delete corrections and tracked totals per task
 - Timezone-aware daily summaries and seven-day chart-ready reporting
+- Deadline reminders surfaced on the task board and dashboard
 - Responsive light/dark dashboard UI with loading, error and empty states
 - Structured validation, centralized error handling, request hardening and OpenAPI JSON documentation
 
@@ -27,7 +29,7 @@ The API is designed around invariants rather than only happy-path CRUD:
 - Timer starts execute inside a serializable Prisma transaction, so concurrent requests fail with a meaningful `409` response.
 - Every resource lookup is scoped by authenticated `userId`; knowing another task ID does not grant access.
 - Daily totals clip sessions at timezone-aware day boundaries, including sessions that cross midnight or are still active.
-- The AI task suggestion endpoint has a deterministic local fallback, so task creation remains functional without an API key.
+- The Gemini task suggestion endpoint has a deterministic local fallback, so task creation remains functional without an API key.
 
 ## Tech Stack
 
@@ -38,8 +40,26 @@ The API is designed around invariants rather than only happy-path CRUD:
 | Authentication | JWT HTTP-only cookie, bcryptjs |
 | Database | PostgreSQL, Prisma ORM |
 | Security | Helmet, CORS, auth rate limiting |
-| AI assistant | OpenAI API with fallback mode |
+| AI assistant | Gemini API with fallback mode |
 | Tests | Vitest |
+
+## Development Effort
+
+Approximate time spent building this project: **6 hours**.
+
+## Screenshots
+
+### Dashboard: daily summary, weekly chart and reminders
+
+![Focused Flow dashboard with weekly productivity chart and reminders](./output/playwright/dashboard.png)
+
+### Task management: status filtering, deadlines and quick completion
+
+![Focused Flow task board with task status controls and reminder deadlines](./output/playwright/tasks.png)
+
+### Time tracking: historical session CRUD
+
+![Focused Flow time log page with manual session form](./output/playwright/time-logs.png)
 
 ## Repository Structure
 
@@ -140,16 +160,19 @@ Production environment variables required on the API:
 
 ```env
 NODE_ENV=production
-CLIENT_URL=https://your-frontend-domain.vercel.app
-DATABASE_URL=your-neon-postgresql-url
+CLIENT_URL=https://frontend-domain.vercel.app
+DATABASE_URL=neon-postgresql-url
 JWT_SECRET=a-long-random-production-secret
-OPENAI_API_KEY=optional-key-for-live-ai-suggestions
+GEMINI_API_KEY=google-ai-studio
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 Frontend environment variable:
 
 ```env
-VITE_API_URL=https://your-render-api-domain.onrender.com/api
+VITE_API_URL=https://render-api-domain.onrender.com/api
 ```
 
-Before submission, replace the pending links at the top of this file after production smoke testing.
+For Vercel-to-Render authentication, the API already issues a secure cross-site session cookie in production and accepts credentialed requests only from `CLIENT_URL`.
+
+Before submission, replace the pending live links at the top of this file after production smoke testing.
