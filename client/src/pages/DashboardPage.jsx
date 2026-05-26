@@ -33,17 +33,23 @@ export const DashboardPage = () => {
         <div className="date-chip">{new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}</div>
       </section>
       <TimerPanel activeTimer={active.data} onStop={stop.mutate} onGoTasks={() => navigate("/tasks")} />
-      <div className="stats-grid">
-        <StatCard icon={Clock3} label="Tracked today" value={formatDuration(summary?.trackedSeconds)} detail="Focused time" />
-        <StatCard icon={Target} label="Tasks worked on" value={summary?.tasksWorkedOn.length ?? 0} detail="Today" tone="blue" />
-        <StatCard icon={CheckCircle2} label="Completed" value={summary?.completedToday ?? 0} detail="Finished today" tone="green" />
-        <StatCard icon={ListTodo} label="Remaining" value={summary?.openTasks ?? 0} detail="Open tasks" tone="orange" />
-      </div>
+      <section className="daily-summary" aria-label="Daily summary">
+        <div className="section-heading">
+          <div><h2>Daily Summary</h2><p>Today&apos;s tracked work and task progress</p></div>
+          <span className="summary-date">Today</span>
+        </div>
+        <div className="stats-grid">
+          <StatCard icon={Clock3} label="Total time tracked" value={formatDuration(summary?.trackedSeconds)} detail="Today" />
+          <StatCard icon={Target} label="Tasks worked on" value={summary?.tasksWorkedOn.length ?? 0} detail="Touched today" tone="blue" />
+          <StatCard icon={CheckCircle2} label="Completed tasks" value={summary?.completedToday ?? 0} detail="Finished today" tone="green" />
+          <StatCard icon={ListTodo} label="Pending / In progress" value={summary?.openTasks ?? 0} detail="Still open" tone="orange" />
+        </div>
+      </section>
       <div className="dashboard-grid">
         <WeeklyChart days={weekly.data?.days} />
         <div className="dashboard-stack">
           <section className="card activity-card">
-            <div className="card-title"><div><h2>Today's activity</h2><p>Tasks touched today</p></div><button onClick={() => navigate("/tasks")}>All tasks</button></div>
+            <div className="card-title"><div><h2>Tasks Worked On Today</h2><p>Included in the daily summary</p></div><button onClick={() => navigate("/tasks")}>All tasks</button></div>
             {summary?.tasksWorkedOn.length ? summary.tasksWorkedOn.map((task) => (
               <div className="activity" key={task.id}>
                 <div><strong>{task.title}</strong><small className={`status ${task.status.toLowerCase()}`}>{titleCaseStatus(task.status)}</small></div>

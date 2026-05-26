@@ -5,7 +5,7 @@ export const WeeklyChart = ({ days = [] }) => {
   const chartData = days.map((day) => ({ ...day, minutes: Math.round(day.trackedSeconds / 60) }));
   return (
     <section className="card chart-card">
-      <div className="card-title"><div><h2>Weekly focus</h2><p>Time tracked during the last seven days</p></div></div>
+      <div className="card-title"><div><h2>Weekly Summary</h2><p>Tracked focus time over the last seven days</p></div></div>
       <div className="chart">
         <ResponsiveContainer width="100%" height={252} minWidth={0}>
           <BarChart data={chartData} barSize={30}>

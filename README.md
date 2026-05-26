@@ -17,7 +17,8 @@ Focused Flow is a full-stack task and time tracking application built for focuse
 - One-click task completion for fast workflow updates
 - Exclusive real-time timer: only one active session per user, with refresh-safe elapsed display
 - Time log history with manual create/edit/delete corrections and tracked totals per task
-- Timezone-aware daily summaries and seven-day chart-ready reporting
+- Explicit Daily Summary view for tasks worked on, total tracked time, completed tasks and remaining work
+- Weekly Summary productivity chart covering the last seven days
 - Deadline reminders surfaced on the task board and dashboard
 - Responsive light/dark dashboard UI with loading, error and empty states
 - Structured validation, centralized error handling, request hardening and OpenAPI JSON documentation
@@ -50,7 +51,7 @@ Approximate time spent building this project: **6 hours**.
 
 ## Screenshots
 
-### Dashboard: daily summary, weekly chart and reminders
+### Dashboard: Daily Summary, Weekly Summary and reminders
 
 ![Focused Flow dashboard with weekly productivity chart and reminders](./output/playwright/dashboard.png)
 
