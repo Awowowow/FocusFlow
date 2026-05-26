@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: focusflow
+      POSTGRES_PASSWORD: focusflow
+      POSTGRES_DB: focusflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - focusflow_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U focusflow -d focusflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  focusflow_data:
+
