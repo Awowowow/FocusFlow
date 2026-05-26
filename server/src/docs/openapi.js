@@ -33,7 +33,7 @@ export const openapi = {
       patch: { tags: ["Time"], summary: "Correct a completed time log", responses: { 200: { description: "Updated" }, 409: { description: "Active or overlapping log" } } },
       delete: { tags: ["Time"], summary: "Delete a completed time log", responses: { 204: { description: "Deleted" }, 409: { description: "Active log" } } },
     },
-    "/summary/today": { get: { tags: ["Summary"], summary: "Daily productivity summary in user timezone", responses: { 200: { description: "Summary" } } } },
+    "/summary/today": { get: { tags: ["Summary"], summary: "Daily productivity summary with open task reminders", responses: { 200: { description: "Summary" } } } },
     "/summary/weekly": { get: { tags: ["Summary"], summary: "Seven day tracked-time series", responses: { 200: { description: "Chart-ready series" } } } },
   },
 };

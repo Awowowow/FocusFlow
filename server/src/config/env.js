@@ -9,8 +9,8 @@ const schema = z.object({
   JWT_SECRET: z.string().min(32),
   JWT_EXPIRES_IN: z.string().default("7d"),
   COOKIE_NAME: z.string().default("focusflow_token"),
-  OPENAI_API_KEY: z.string().optional(),
-  OPENAI_MODEL: z.string().default("gpt-4o-mini"),
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().default("gemini-2.5-flash"),
 });
 
 const result = schema.safeParse(process.env);
@@ -21,4 +21,3 @@ if (!result.success) {
 }
 
 export const env = result.data;
-

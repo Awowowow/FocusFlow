@@ -2,11 +2,11 @@ import { env } from "../config/env.js";
 import { createAccount, authenticate } from "../services/auth.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { publicUser } from "../utils/presenters.js";
-import { authCookieOptions, signToken } from "../utils/token.js";
+import { authCookieOptions, clearAuthCookieOptions, signToken } from "../utils/token.js";
 
-function attachSession(res, user) {
+const attachSession = (res, user) => {
   res.cookie(env.COOKIE_NAME, signToken(user.id), authCookieOptions);
-}
+};
 
 export const register = asyncHandler(async (req, res) => {
   const user = await createAccount(req.body);
@@ -21,9 +21,8 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 export const logout = (_req, res) => {
-  res.clearCookie(env.COOKIE_NAME, authCookieOptions);
+  res.clearCookie(env.COOKIE_NAME, clearAuthCookieOptions);
   res.status(204).send();
 };
 
 export const me = (req, res) => res.json({ user: publicUser(req.user) });
-

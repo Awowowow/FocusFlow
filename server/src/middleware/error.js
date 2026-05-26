@@ -1,11 +1,11 @@
 import { env } from "../config/env.js";
 import { AppError } from "../utils/AppError.js";
 
-export function notFound(req, _res, next) {
+export const notFound = (req, _res, next) => {
   next(new AppError(404, `Route ${req.method} ${req.originalUrl} not found.`, "NOT_FOUND"));
-}
+};
 
-export function errorHandler(error, _req, res, _next) {
+export const errorHandler = (error, _req, res, _next) => {
   let normalized = error;
   if (error.code === "P2002") normalized = new AppError(409, "That value is already in use.", "CONFLICT");
   if (!(normalized instanceof AppError)) {
@@ -20,5 +20,4 @@ export function errorHandler(error, _req, res, _next) {
       ...(env.NODE_ENV === "development" && error.stack && { stack: error.stack }),
     },
   });
-}
-
+};

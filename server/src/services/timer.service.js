@@ -2,14 +2,14 @@ import { prisma } from "../config/prisma.js";
 import { AppError } from "../utils/AppError.js";
 import { ensureTask } from "./task.service.js";
 
-export async function activeTimer(userId) {
+export const activeTimer = async (userId) => {
   return prisma.timeLog.findFirst({
     where: { userId, endedAt: null },
     include: { task: { select: { id: true, title: true, status: true } } },
   });
-}
+};
 
-export async function startTimer(userId, taskId) {
+export const startTimer = async (userId, taskId) => {
   try {
     return await prisma.$transaction(async (tx) => {
       const task = await ensureTask(userId, taskId, tx);
@@ -32,9 +32,9 @@ export async function startTimer(userId, taskId) {
     }
     throw error;
   }
-}
+};
 
-export async function stopTimer(userId, taskId) {
+export const stopTimer = async (userId, taskId) => {
   return prisma.$transaction(async (tx) => {
     await ensureTask(userId, taskId, tx);
     const active = await tx.timeLog.findFirst({ where: { userId, taskId, endedAt: null } });
@@ -47,18 +47,18 @@ export async function stopTimer(userId, taskId) {
       include: { task: { select: { id: true, title: true, status: true } } },
     });
   });
-}
+};
 
-export async function listLogs(userId, input) {
+export const listLogs = async (userId, input) => {
   return prisma.timeLog.findMany({
     where: { userId, ...(input.taskId && { taskId: input.taskId }) },
     include: { task: { select: { id: true, title: true, status: true } } },
     orderBy: { startedAt: "desc" },
     take: input.limit,
   });
-}
+};
 
-export async function createLog(userId, input) {
+export const createLog = async (userId, input) => {
   return prisma.$transaction(async (tx) => {
     await ensureTask(userId, input.taskId, tx);
     const startedAt = new Date(input.startedAt);
@@ -76,9 +76,9 @@ export async function createLog(userId, input) {
       include: { task: { select: { id: true, title: true, status: true } } },
     });
   });
-}
+};
 
-export async function updateLog(userId, logId, input) {
+export const updateLog = async (userId, logId, input) => {
   return prisma.$transaction(async (tx) => {
     const existing = await tx.timeLog.findFirst({ where: { id: logId, userId } });
     if (!existing) throw new AppError(404, "Time log not found.", "TIME_LOG_NOT_FOUND");
@@ -92,20 +92,20 @@ export async function updateLog(userId, logId, input) {
       include: { task: { select: { id: true, title: true, status: true } } },
     });
   });
-}
+};
 
-export async function deleteLog(userId, logId) {
+export const deleteLog = async (userId, logId) => {
   const existing = await prisma.timeLog.findFirst({ where: { id: logId, userId } });
   if (!existing) throw new AppError(404, "Time log not found.", "TIME_LOG_NOT_FOUND");
   if (!existing.endedAt) throw new AppError(409, "Stop an active timer before deleting it.", "ACTIVE_TIMER");
   await prisma.timeLog.delete({ where: { id: logId } });
-}
+};
 
-function durationSeconds(startedAt, endedAt) {
+const durationSeconds = (startedAt, endedAt) => {
   return Math.max(1, Math.floor((endedAt - startedAt) / 1000));
-}
+};
 
-async function ensureNoOverlap(tx, userId, startedAt, endedAt, excludedId) {
+const ensureNoOverlap = async (tx, userId, startedAt, endedAt, excludedId) => {
   const conflicting = await tx.timeLog.findFirst({
     where: {
       userId,
@@ -117,4 +117,4 @@ async function ensureNoOverlap(tx, userId, startedAt, endedAt, excludedId) {
   if (conflicting) {
     throw new AppError(409, "This session overlaps an existing time log.", "TIME_LOG_OVERLAP");
   }
-}
+};

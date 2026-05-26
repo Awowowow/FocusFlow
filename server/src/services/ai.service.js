@@ -1,7 +1,18 @@
-import OpenAI from "openai";
 import { env } from "../config/env.js";
 
-function fallbackSuggestion(input) {
+const systemInstruction =
+  "Turn a user's rough task into a practical title and one-sentence description. Keep the title under 80 characters. Do not invent people, tools, deadlines, or facts that were not provided.";
+
+const suggestionSchema = {
+  type: "object",
+  properties: {
+    title: { type: "string", description: "A clear actionable task title." },
+    description: { type: "string", description: "A one-sentence practical next step." },
+  },
+  required: ["title", "description"],
+};
+
+const fallbackSuggestion = (input) => {
   const cleaned = input.trim().replace(/\s+/g, " ");
   const title = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
   return {
@@ -9,29 +20,48 @@ function fallbackSuggestion(input) {
     description: `Complete this task: ${cleaned}. Add any key details or follow-up steps before starting.`,
     source: "fallback",
   };
-}
+};
 
-export async function suggestTask(input) {
-  if (!env.OPENAI_API_KEY) return fallbackSuggestion(input);
-  const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+export const suggestTask = async (input) => {
+  if (!env.GEMINI_API_KEY) return fallbackSuggestion(input);
+
   try {
-    const response = await client.responses.create({
-      model: env.OPENAI_MODEL,
-      input: [
-        {
-          role: "system",
-          content: "Turn a user's rough task into a practical title and one-sentence description. Return JSON only with title and description. Keep the title under 80 characters and do not invent specifics.",
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(env.GEMINI_MODEL)}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": env.GEMINI_API_KEY,
         },
-        { role: "user", content: input },
-      ],
-    });
-    const parsed = JSON.parse(response.output_text);
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemInstruction }] },
+          contents: [{ role: "user", parts: [{ text: input }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseJsonSchema: suggestionSchema,
+            temperature: 0.2,
+            maxOutputTokens: 240,
+          },
+        }),
+        signal: AbortSignal.timeout(10000),
+      },
+    );
+    if (!response.ok) throw new Error(`Gemini returned ${response.status}`);
+
+    const result = await response.json();
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    const parsed = JSON.parse(text);
     if (typeof parsed.title === "string" && typeof parsed.description === "string") {
-      return { title: parsed.title.slice(0, 120), description: parsed.description.slice(0, 1000), source: "ai" };
+      return {
+        title: parsed.title.trim().slice(0, 120),
+        description: parsed.description.trim().slice(0, 1000),
+        source: "gemini",
+      };
     }
   } catch (error) {
-    console.warn("AI suggestion unavailable; using fallback.", error.message);
+    console.warn("Gemini suggestion unavailable; using fallback.", error.message);
   }
-  return fallbackSuggestion(input);
-}
 
+  return fallbackSuggestion(input);
+};

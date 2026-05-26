@@ -6,14 +6,13 @@ const server = app.listen(env.PORT, () => {
   console.log(`FocusFlow API listening on http://localhost:${env.PORT}`);
 });
 
-async function shutdown(signal) {
+const shutdown = async (signal) => {
   console.log(`${signal} received, shutting down.`);
   server.close(async () => {
     await prisma.$disconnect();
     process.exit(0);
   });
-}
+};
 
 process.on("SIGTERM", () => shutdown("SIGTERM"));
 process.on("SIGINT", () => shutdown("SIGINT"));
-

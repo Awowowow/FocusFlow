@@ -4,7 +4,7 @@ import { taskWithTrackedTime } from "../utils/presenters.js";
 
 const timeSelection = { id: true, startedAt: true, endedAt: true, durationSeconds: true };
 
-export async function listTasks(userId, query) {
+export const listTasks = async (userId, query) => {
   const orderBy = query.sort === "oldest" ? { createdAt: "asc" } : query.sort === "updated" ? { updatedAt: "desc" } : { createdAt: "desc" };
   const tasks = await prisma.task.findMany({
     where: {
@@ -21,26 +21,26 @@ export async function listTasks(userId, query) {
     orderBy,
   });
   return tasks.map((task) => taskWithTrackedTime(task));
-}
+};
 
-export async function getTask(userId, taskId) {
+export const getTask = async (userId, taskId) => {
   const task = await prisma.task.findFirst({
     where: { id: taskId, userId },
     include: { timeLogs: { orderBy: { startedAt: "desc" } } },
   });
   if (!task) throw new AppError(404, "Task not found.", "TASK_NOT_FOUND");
   return taskWithTrackedTime(task);
-}
+};
 
-export async function createTask(userId, input) {
+export const createTask = async (userId, input) => {
   const task = await prisma.task.create({
     data: { ...input, dueDate: input.dueDate ? new Date(input.dueDate) : null, userId },
     include: { timeLogs: { select: timeSelection } },
   });
   return taskWithTrackedTime(task);
-}
+};
 
-export async function updateTask(userId, taskId, input) {
+export const updateTask = async (userId, taskId, input) => {
   await ensureTask(userId, taskId);
   const data = {
     ...input,
@@ -54,20 +54,19 @@ export async function updateTask(userId, taskId, input) {
     include: { timeLogs: { select: timeSelection } },
   });
   return taskWithTrackedTime(task);
-}
+};
 
-export async function deleteTask(userId, taskId) {
+export const deleteTask = async (userId, taskId) => {
   await ensureTask(userId, taskId);
   const activeLog = await prisma.timeLog.findFirst({ where: { taskId, userId, endedAt: null } });
   if (activeLog) throw new AppError(409, "Stop the active timer before deleting this task.", "ACTIVE_TIMER");
   await prisma.task.delete({ where: { id: taskId } });
-}
+};
 
-async function ensureTask(userId, taskId, client = prisma) {
+const ensureTask = async (userId, taskId, client = prisma) => {
   const task = await client.task.findFirst({ where: { id: taskId, userId } });
   if (!task) throw new AppError(404, "Task not found.", "TASK_NOT_FOUND");
   return task;
-}
+};
 
 export { ensureTask };
-

@@ -14,3 +14,9 @@ export const authCookieOptions = {
   path: "/",
 };
 
+export const clearAuthCookieOptions = {
+  httpOnly: authCookieOptions.httpOnly,
+  secure: authCookieOptions.secure,
+  sameSite: authCookieOptions.sameSite,
+  path: authCookieOptions.path,
+};
